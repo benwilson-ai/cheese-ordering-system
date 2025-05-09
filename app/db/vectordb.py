@@ -3,7 +3,7 @@ from pinecone.grpc import PineconeGRPC as Pinecone
 from pinecone import ServerlessSpec
 import uuid
 from app.core.config import settings, ModelType
-from app.schemas.retail_lease import RetailLease
+from app.schemas.cheese_data import CheeseData
 from typing import List
 
 class VectorDBService:
@@ -29,36 +29,36 @@ class VectorDBService:
             )
         return self.pc.Index(settings.PINECONE_INDEX_NAME)
 
-    def _generate_vector_text(self, lease: RetailLease) -> str:
+    def _generate_vector_text(self, cheese: CheeseData) -> str:
         fields = [
-            (lease.centre_name, "Shopping Centre"),
-            (lease.tenant_category, "Business Category"),
-            (lease.tenant_subcategory, "Business Subcategory"),
-            (lease.lessor, "Property Owner"),
-            (lease.lessee, "Tenant")
+            (cheese.type, ""),
+            (cheese.form, ""),
+            (cheese.brand, "")
         ]
         return "\n".join([f"{label}: {value}" for value, label in fields if value])
 
-    def upsert_lease(self, lease: RetailLease):
+    def upsert_cheese(self, cheese: CheeseData):
         embedding_id = str(uuid.uuid4())
-        metadata = lease.model_dump()
-        metadata['start_date'] = metadata['start_date'].strftime('%Y-%m-%d')
-        metadata['expiry_date'] = metadata['expiry_date'].strftime('%Y-%m-%d')
+        # metadata = cheese.model_dump()
+        metadata={}
+        metadata ['id']=cheese.id
+        # metadata['start_date'] = metadata['start_date'].strftime('%Y-%m-%d')
+        # metadata['expiry_date'] = metadata['expiry_date'].strftime('%Y-%m-%d')
         vector = [{
             'id': embedding_id,
-            'values': self.embed_model.embed_documents(self._generate_vector_text(lease))[0],
+            'values': self.embed_model.embed_documents(self._generate_vector_text(cheese))[0],
             'metadata': metadata,
         }]
         self.index.upsert(vectors=vector)
         return embedding_id
 
-    def query(self, query_text: str, top_k: int = 5) -> List[RetailLease]:
+    def query(self, query_text: str, top_k: int = 5) -> List[CheeseData]:
         vector = self.embed_model.embed_documents([query_text])[0]
         results = self.index.query(
             vector=vector,
             top_k=top_k,
             include_metadata=True
         )
-        return [RetailLease(**match['metadata']) for match in results['matches']]
+        return [CheeseData(**match['metadata']) for match in results['matches']]
 
 vector_db = VectorDBService()
