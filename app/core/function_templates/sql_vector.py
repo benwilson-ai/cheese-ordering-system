@@ -4,6 +4,24 @@ function_list = [
     {
         "type": "function",
         "function": {
+            "name": "determine_is_available",
+            "description": "This function is using conversation between user and assistant as input and determine whether user is asking about cheese or not",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "is_available": {
+                        "type": "string",
+                        "enum": ["yes", "no", "unknown"],
+                        "description": "If user is asking about cheese this property returns 'yes', and if user is not asking about cheese is good return 'no', and if information is not provided, return 'unknown'"
+                    }
+                },
+                "required": ["is_available"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
             "name": "determine_sql_or_vector",
             "description": "This function is using conversation between user and assistant as input and determine whether using sql is good or using vectordb is good",
             "parameters": {
