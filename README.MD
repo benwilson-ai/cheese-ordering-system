@@ -1,15 +1,15 @@
-# Retail Leases AI Assistant
+# Cheeses Ordering AI Assistant
 
-A Streamlit-based chatbot application powered by OpenAI that helps users analyze and understand retail lease data. The application combines vector similarity search and SQL querying capabilities to provide comprehensive insights about retail leases.
+A Streamlit-based chatbot application powered by OpenAI that helps users analyze and understand retail cheese data. The application combines vector similarity search and SQL querying capabilities to provide comprehensive insights about retail cheeses.
 
 ## Features
 
 - 📊 CSV file upload and processing
 - 💬 Interactive chat interface
 - 📈 Data visualization capabilities
-- 🔍 Hybrid search (SQL + Vector) for lease information
+- 🔍 Hybrid search (SQL + Vector) for cheese information
 - 🤖 AI-powered natural language understanding
-- 📋 Comprehensive lease data management
+- 📋 Comprehensive cheese data management
 
 ## Technology Stack
 
