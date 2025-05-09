@@ -311,8 +311,43 @@ def main():
 # Add theme toggle in sidebar
 with st.sidebar:
     st.header("Settings")
-    st.header("Data Upload")
-    uploaded_file = st.file_uploader("Upload data file", type=['csv', 'json'])
+    st.header("DB Update")
+    
+    # Initialize button state in session state if not exists
+    if 'is_auto_updating' not in st.session_state:
+        st.session_state.is_auto_updating = False
+        
+    # Create custom CSS to center-align the buttons and add padding
+    st.markdown("""
+        <style>
+        div[data-testid="stFileUploader"] {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        div[data-testid="stFileUploader"] > div {
+            display: flex;
+            justify-content: center;
+        }
+        button[data-testid="baseButton-secondary"] {
+            margin-bottom: 20px;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+    
+    # Create a container for file uploader and button
+    upload_container = st.container()
+    with upload_container:
+        uploaded_file = st.file_uploader("Update DB using file", type=['csv', 'json'])
+        
+        # Toggle button label based on state
+        button_label = "Cancel update" if st.session_state.is_auto_updating else "Auto update DB"
+        auto_btn = st.button(button_label, key="auto_update_btn", use_container_width=True)
+        
+        if auto_btn:
+            st.session_state.is_auto_updating = not st.session_state.is_auto_updating
+            
     if uploaded_file is not None:
         try:
             with st.spinner('Processing file...'):
@@ -323,14 +358,24 @@ with st.sidebar:
             st.success('File successfully processed and stored in databases!')
         except Exception as e:
             st.error(f'Error processing file: {str(e)}')
+            
+    if st.session_state.is_auto_updating:
+        try:
+            with st.spinner('Scraping data...'):
+                upload_service.process_auto_update()
+            st.success('Scraping successfully processed and stored in databases!')
+        except Exception as e:
+            st.error(f'Error processing file: {str(e)}')
+            st.session_state.is_auto_updating = False
 
-st.title("💬 Cheese Ordering Assistant")
+st.title("🧀 Cheese Ordering Assistant")
 st.caption("🚀 A Streamlit chatbot powered by OpenAI")
 
 # Chat interface
 if "messages" not in st.session_state:
     st.session_state["messages"] = [
-        {"role": "assistant", "content": "Hello, I am here to help you order any cheese, please tell me what you want to order this time!  "}
+        {"role": "user", "content": "Hi, my AI friend!💬"},
+        {"role": "assistant", "content": "Hi, Cheese Lover, I am here to help you about our 🧀, please tell me what you want this time!💬"}
     ]
 
 for msg in st.session_state.messages:
