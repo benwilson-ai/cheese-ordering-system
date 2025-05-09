@@ -52,7 +52,7 @@ class VectorDBService:
         self.index.upsert(vectors=vector)
         return embedding_id
 
-    def query(self, query_text: str, top_k: int = 10) -> List[CheeseData]:
+    def query(self, query_text: str, top_k: int = 5) -> List[CheeseData]:
         vector = self.embed_model.embed_documents([query_text])[0]
         results = self.index.query(
             vector=vector,
