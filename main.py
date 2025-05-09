@@ -342,7 +342,7 @@ with st.sidebar:
         uploaded_file = st.file_uploader("Update DB using file", type=['csv', 'json'])
         
         # Toggle button label based on state
-        button_label = "Cancel update" if st.session_state.is_auto_updating else "Auto update DB"
+        button_label = "Auto update DB" if st.session_state.is_auto_updating else "Auto update DB"
         auto_btn = st.button(button_label, key="auto_update_btn", use_container_width=True)
         
         if auto_btn:
@@ -379,16 +379,22 @@ if "messages" not in st.session_state:
     ]
 
 for msg in st.session_state.messages:
-    with st.chat_message(msg["role"], avatar="imgs/avatar_streamly.png" if msg["role"] == "assistant" else "imgs/stuser.png"):
+    
+    if msg["role"] == "assistant": 
+        avatar="imgs/avatar_streamly.png"     
+    elif  msg["role"] == "user": 
+        avatar="imgs/stuser.png"
+    with st.chat_message(msg["role"], avatar=avatar):
         st.markdown(f'<div style="padding: 1em; border-radius: 1em; background: #23272f; color: #fff; margin-bottom: 0.5em;">{msg["content"]}</div>', unsafe_allow_html=True)
 
 if prompt := st.chat_input():
     with st.chat_message("user", avatar="imgs/stuser.png"):
         st.markdown(f'<div style="padding: 1em; border-radius: 1em; background: #2d3748; color: #fff; margin-bottom: 0.5em;">{prompt}</div>', unsafe_allow_html=True)
+    st.session_state.messages.append({"role": "user", "content": prompt})
     # Show thinking indicator
     with st.spinner("Thinking..."):
         result = chat_service.process_message(prompt, st.session_state.messages)
-    st.session_state.messages.append({"role": "user", "content": prompt})
+        st.session_state.messages.append({"role": "system", "content": result['context']})
     st.session_state.messages.append({"role": "assistant", "content": result["response"]})
     with st.chat_message("assistant", avatar="imgs/avatar_streamly.png"):
         st.markdown(f'<div style="padding: 1em; border-radius: 1em; background: #23272f; color: #fff; margin-bottom: 0.5em;">{result["response"]}</div>', unsafe_allow_html=True)

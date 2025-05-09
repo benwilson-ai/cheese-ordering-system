@@ -78,12 +78,13 @@ def data_retrieval_node(state: GraphState) -> GraphState:
         print(state.sql_query)
         
         results = mysql_db.query(state.sql_query)
-        print("We are here")
+        state.id_list = [result['id'] for result in results]
     else:
         print(state.query)
-        results = vector_db.query(state.query, top_k=3)
+        results = vector_db.query(state.query, top_k=5)
         results = [result.model_dump() for result in results]
-    
+        state.id_list = [result['id'] for result in results]
+
     state.raw_data = results
     
     # Dynamically build context string using only available fields

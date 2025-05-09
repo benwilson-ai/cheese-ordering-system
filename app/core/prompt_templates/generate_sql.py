@@ -120,22 +120,25 @@ SQL Query:
 
 SELECT * FROM cheese_data WHERE price BETWEEN 50 AND 100 ORDER BY price DESC LIMIT 20;
 
-Example 7: Find cheese products with a specific type and wholesale price, and limit to 5 results
+Find cheese products with a specific type and wholesale price, and limit to 5 results
 Customer Question: "What Mozzarella cheese products have a wholesale price of 'Buy 10+ pay $5', limited to 5 results?"
 SQL Query:
 
 SELECT * FROM cheese_data WHERE type LIKE '%Mozzarella%' AND wholesale = 'Buy 10+ pay $5' LIMIT 5;
-Example 8: Find cheese products with a specific brand and out of stock status, and sort by SKU
+
+Find cheese products with a specific brand and out of stock status, and sort by SKU
 Customer Question: "What cheese products from the 'North Beach' brand are currently out of stock, sorted by SKU from lowest to highest?"
 SQL Query:
 
 SELECT * FROM cheese_data WHERE brand = 'North Beach' AND out_of_stock = 'BACK IN STOCK SOON' ORDER BY sku ASC;
-Example 9: Find the total price of cheese products by brand and type
+
+Find the total price of cheese products by brand and type
 Customer Question: "What is the total price of Mozzarella cheese products from the 'North Beach' brand?"
 SQL Query:
 
 SELECT SUM(price) AS total_price FROM cheese_data WHERE brand = 'North Beach' AND type LIKE '%Mozzarella%';
-Example 10: Find cheese products with a specific form and price range, and exclude products that are out of stock
+
+Find cheese products with a specific form and price range, and exclude products that are out of stock
 Customer Question: "What slice cheese products do you have between 10 and 20, excluding products that are currently out of stock?"
 SQL Query:
 
