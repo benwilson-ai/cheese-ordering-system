@@ -111,7 +111,7 @@ When generating the query:
 
 For example, Please show me all cheese that is cheaper than $50 per each.
 
-```SELECT id, type\nFROM cheese_data\nWHERE price < 50 ORDER BY price DESC;```
+```SELECT type AS names\nFROM cheese_data\nWHERE price < 50 ORDER BY price DESC;```
 Can you show me all goat cheese?
 ```SELECT id, type FROM cheese_data WHERE type LIKE '%goat%'```
 

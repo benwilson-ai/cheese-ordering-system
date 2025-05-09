@@ -397,7 +397,7 @@ if prompt := st.chat_input():
     
     st.session_state.messages.append({"role": "assistant", "content": result["response"]})
     with st.chat_message("assistant", avatar="imgs/avatar_streamly.png"):
-        st.markdown(f'<div style="padding: 1em; border-radius: 1em; background: #23272f; color: #fff; margin-bottom: 0.5em;">{result["context"]}</div>', unsafe_allow_html=True)
+        # st.markdown(f'<div style="padding: 1em; border-radius: 1em; background: #23272f; color: #fff; margin-bottom: 0.5em;">{result["context"]}</div>', unsafe_allow_html=True)
         st.markdown(f'<div style="padding: 1em; border-radius: 1em; background: #23272f; color: #fff; margin-bottom: 0.5em;">{result["response"]}</div>', unsafe_allow_html=True)
 
 if __name__ == "__main__":
