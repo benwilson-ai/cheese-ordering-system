@@ -81,7 +81,7 @@ def data_retrieval_node(state: GraphState) -> GraphState:
 
     else:
         print(state.query)
-        results = vector_db.query(state.query, top_k=5)
+        results = vector_db.query(state.query, top_k=3)
         results = [result.model_dump() for result in results]
     state.raw_data = results
     
