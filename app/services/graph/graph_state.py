@@ -2,6 +2,10 @@ from typing import List, Dict, Optional
 from enum import Enum
 from pydantic import BaseModel
 
+
+class AvailableEnum(str, Enum):
+    AVAILABLE = "available"
+    NOT_AVAILABLE = "not available"
 class DatabaseEnum(str, Enum):
     MYSQL = "mysql"
     VECTORDB = "vectordb"
@@ -16,4 +20,3 @@ class GraphState(BaseModel):
     query: Optional[str] = None
     sql_query: Optional[str] = None
     raw_data: Optional[List[Dict]] = None
-    visualization: Optional[Dict] = None

@@ -1,14 +1,14 @@
 from typing import List, Dict
-from langgraph.graph import StateGraph
+from langgraph.graph import StateGraph, START
 from langchain_openai import ChatOpenAI
 from app.core.config import settings, ModelType
-from app.services.graph.graph_state import GraphState, DatabaseEnum
+from app.services.graph.graph_state import GraphState, DatabaseEnum, AvailableEnum
 from app.services.graph.graph_nodes import (
-    query_transformation_node,
+    determine_about_cheese,
     determine_database,
+    query_transformation_node,
     txt2sql_node,
     data_retrieval_node,
-    visualization_node
 )
 
 class ChatService:
@@ -23,12 +23,18 @@ class ChatService:
         workflow = StateGraph(state_schema=GraphState)
         
         # Add nodes
-        workflow.add_node("query_transformation", query_transformation_node)
         workflow.add_node("txt2sql", txt2sql_node)
         workflow.add_node("data_retrieval", data_retrieval_node)
-        workflow.add_node("visual_show", visualization_node)
-        
+        workflow.add_node("query_transformation", query_transformation_node)
         # Add conditional edges
+        workflow.add_conditional_edges(
+            START,
+            determine_about_cheese,
+            {
+                AvailableEnum.AVAILABLE: "query_transformation",
+                AvailableEnum.NOT_AVAILABLE: "data_retrieval"
+            }
+        )
         workflow.add_conditional_edges(
             "query_transformation",
             determine_database,
@@ -40,10 +46,7 @@ class ChatService:
 
         # Add edges
         workflow.add_edge("txt2sql", "data_retrieval")
-        workflow.add_edge("data_retrieval", "visual_show")
-
-        workflow.set_entry_point("query_transformation")
-        workflow.set_finish_point("visual_show")
+        workflow.set_finish_point("data_retrieval")
         
         return workflow.compile()
 
@@ -55,8 +58,7 @@ class ChatService:
         
         # Check if visualization is needed
         # if "compare" in query.lower() or "chart" in query.lower():
-        return {"response": final_state["messages"][-1]["content"],
-                "visualization": final_state["visualization"]}
+        return {"response": final_state["messages"][-1]["content"]}
         # return {"response": final_state["messages"][-1]["content"]}
 
 chat_service = ChatService()
