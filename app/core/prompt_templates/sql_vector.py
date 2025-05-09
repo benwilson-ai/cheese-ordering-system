@@ -138,7 +138,7 @@ d
 50and100?"
 SQL Query:
 
-SELECT * FROM cheese_data WHERE price BETWEEN 50 AND 100;
+SELECT * FROM cheese_data WHERE price BETWEEN 50 AND 100 ORDER BY price DESC LIMIT 20;
 Example 5: Find cheese products with a specific form
 Customer Question: "What specialty cheese products do you have?"
 SQL Query:

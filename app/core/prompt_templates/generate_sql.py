@@ -112,7 +112,13 @@ For example one genration you made is as follows.
 
 instead of this you need to generate following one.
 SELECT id, type\nFROM cheese_data\nORDER BY price DESC\nLIMIT 5;
+MUST Focus on DESC when ORDER BY price or weight, volume and so on.
 
+Here are common examples.
+Customer Question: "What cheese products do you have between 50$ and 100$?"
+SQL Query:
+
+SELECT * FROM cheese_data WHERE price BETWEEN 50 AND 100 ORDER BY price DESC LIMIT 20;
 
 Example 7: Find cheese products with a specific type and wholesale price, and limit to 5 results
 Customer Question: "What Mozzarella cheese products have a wholesale price of 'Buy 10+ pay $5', limited to 5 results?"
