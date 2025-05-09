@@ -30,7 +30,7 @@ function_list = [
                     "is_sql": {
                         "type": "string",
                         "enum": ["yes", "no", "unknown"],
-                        "description": "If using SQL is good this property returns 'yes', and if using vectordb is good return 'no', and if information is not provided, return 'unknown'"
+                        "description": "If user's question is about cheese type, form, brand, price, price per each, price per lb, case count, size, volume, case and each weight and sku, upc wholesale(Buy 10+ with ...$) back in stock again, You must this property returns 'yes'. If using SQL is good this property returns 'yes', and if using vectordb is good return 'no', and if information is not provided, return 'unknown'"
                     }
                 },
                 "required": ["is_sql"]
