@@ -112,6 +112,7 @@ For example one genration you made is as follows.
 instead of this you need to generate following one.
 SELECT id, type\nFROM cheese_data\nORDER BY price DESC\nLIMIT 5;
 
+MUST Focus on DESC when ORDER BY price or weight, volume and so on.
 Here are examples of customer questions about cheese, along with the correct and optimized SQL queries to answer them:
 
 Find cheese products with a specific brand and out of stock status, and sort by SKU

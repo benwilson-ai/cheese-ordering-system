@@ -20,4 +20,3 @@ class GraphState(BaseModel):
     query: Optional[str] = None
     sql_query: Optional[str] = None
     raw_data: Optional[List[Dict]] = None
-    id_list: Optional[List[int]] = []

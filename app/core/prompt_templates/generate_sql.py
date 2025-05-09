@@ -107,12 +107,19 @@ When generating the query:
 - Do not include any special characters such as ` at the end or beginning of the generation.
 - And also, do not include any other things that is not related to SQL query itself.
 
+1. MUST Focus on "DESC" or "ASC" when "ORDER BY" price or price_per_lb, case weight, each weight, case volume, each volume and so on.
 For example one genration you made is as follows.
 ```SELECT id, type\nFROM cheese_data\nORDER BY price\nLIMIT 5;```
 
 instead of this you need to generate following one.
-SELECT id, type\nFROM cheese_data\nORDER BY price DESC\nLIMIT 5;
-MUST Focus on DESC when ORDER BY price or weight, volume and so on.
+```SELECT id, type\nFROM cheese_data\nORDER BY price DESC\nLIMIT 5;```
+
+
+2. MUST Focus on "IS NOT NULL" when use "WHERE" price or price_per_lb or case weight, each weight, case volume, each volume and so on.
+For example top 5 cheap result.
+```SELECT * FROM cheese_data ORDER BY price ASC LIMIT 5;```
+instead of this you need to generate following one.
+```SELECT * FROM cheese_data WHERE price IS NOT NULL ORDER BY price ASC LIMIT 5;```
 
 Here are common examples.
 Customer Question: "What cheese products do you have between 50$ and 100$?"
