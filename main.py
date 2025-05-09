@@ -1,8 +1,5 @@
 import streamlit as st
 import pandas as pd
-from app.services.upload import upload_service
-from app.services.chat import chat_service
-import openai
 import streamlit as st
 import logging
 from PIL import Image, ImageEnhance
@@ -10,6 +7,8 @@ import time
 import json
 import requests
 import base64
+from app.services.upload_service import upload_service
+from app.services.chat_service import chat_service
 # Set page config with theme support
 st.set_page_config(
     page_title="Cheese Ordering Assistant",
