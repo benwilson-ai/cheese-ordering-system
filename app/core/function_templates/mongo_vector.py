@@ -22,21 +22,21 @@ function_list = [
     {
         "type": "function",
         "function": {
-            "name": "determine_sql_or_vector",
-            "description": "This function is using conversation between user and assistant as input and determine whether using sql is good or using vectordb is good",
+            "name": "determine_mongo_or_vector",
+            "description": "This function is using conversation between user and assistant as input and determine whether using mongoDB is good or using vectordb is good",
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "is_sql": {
+                    "is_mongo": {
                         "type": "string",
                         "enum": ["yes", "no", "unknown"],
-                        "description": "Every questions asking about cheese is about your cheese recorded in Sql database. If user's question is about cheese, especially type, form, brand, price, price per each, price per lb, case count, size, volume, case and each weight and sku, upc wholesale(Buy 10+ with ...$) back in stock again, You must this property returns 'yes'. If using SQL is good this property returns 'yes', and if using vectordb is good return 'no', and if information is not provided, return 'unknown'"
+                        "description": "Every questions asking about cheese is about your cheese recorded in mongoDB. If user's question is about cheese, especially type, form, brand, price, price per each, price per lb, case count, size, volume, case and each weight and sku, upc wholesale(Buy 10+ with ...$) back in stock again, You must this property returns 'yes'. If using mongoDB is good this property returns 'yes'"
                     }
                 },
-                "required": ["is_sql"]
+                "required": ["is_mongo"]
             }
         }
     }
 ]
 
-sql_vector_tool = json.loads(json.dumps(function_list))
+mongo_vector_tool = json.loads(json.dumps(function_list))

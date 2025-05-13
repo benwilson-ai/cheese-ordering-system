@@ -4,7 +4,7 @@ from typing import BinaryIO
 from unittest import skipUnless
 import chardet
 from app.db.vectordb import vector_db
-from app.db.mysql import mysql_db
+from app.db.mongodb import mongodb
 from app.schemas.cheese_data import CheeseData
 from datetime import datetime
 import time
@@ -231,6 +231,7 @@ class UploadService:
             product_info = product.get('product_info', {})
             case_info = product_info.get('case', {})
             each_info = product_info.get('each', {})
+            
             # Create CheeseData object
             cheese = CheeseData(
                 id=idx + 1,  # Generate sequential IDs
@@ -243,19 +244,18 @@ class UploadService:
                 case_volume=case_info.get('volume', None),
                 case_weight=case_info.get('weight', None),
                 each_count=float(each_info.get('count', '0').split()[0]) if each_info.get('count') else None,
-                # each_volume=each_info.get('volume'),
                 each_volume='L 1\" x W 1\" x H 1\"',
                 each_weight=each_info.get('weight'),
                 sku=int(product.get('sku', 0)),
                 upc=int(product.get('upc', 0)),
                 image_url=product.get('image_url'),
                 product_url=product.get('product_url'),
-                wholesale=product.get('bonus', "It has no wholesale price"),  # Default value
-                out_of_stock=product.get('price', "BACK IN STOCK SOON")   # Default value
+                wholesale=product.get('bonus', "It has no wholesale price"),
+                out_of_stock=product.get('price', "BACK IN STOCK SOON")
             )
             
             # Store in both databases
-            mysql_db.insert_cheese(cheese)
+            mongodb.insert_cheese(cheese)
             vector_db.upsert_cheese(cheese)
     
     @staticmethod
@@ -293,8 +293,9 @@ class UploadService:
             )
             
             # Store in both databases
-            mysql_db.insert_cheese(cheese)
+            mongodb.insert_cheese(cheese)
             vector_db.upsert_cheese(cheese)
+
     @staticmethod
     def process_auto_update():
         # Read JSON data
@@ -306,6 +307,7 @@ class UploadService:
             product_info = product.get('product_info', {})
             case_info = product_info.get('case', {})
             each_info = product_info.get('each', {})
+            
             # Create CheeseData object
             cheese = CheeseData(
                 id=idx + 1,  # Generate sequential IDs
@@ -318,18 +320,18 @@ class UploadService:
                 case_volume=case_info.get('volume', None),
                 case_weight=case_info.get('weight', None),
                 each_count=float(each_info.get('count', '0').split()[0]) if each_info.get('count') else None,
-                # each_volume=each_info.get('volume'),
                 each_volume='L 1\" x W 1\" x H 1\"',
                 each_weight=each_info.get('weight'),
                 sku=int(product.get('sku', 0)),
                 upc=int(product.get('upc', 0)),
                 image_url=product.get('image_url'),
                 product_url=product.get('product_url'),
-                wholesale=product.get('bonus', "It has no wholesale price"),  # Default value
-                out_of_stock=product.get('price', "BACK IN STOCK SOON")   # Default value
+                wholesale=product.get('bonus', "It has no wholesale price"),
+                out_of_stock=product.get('price', "BACK IN STOCK SOON")
             )
             
             # Store in both databases
-            mysql_db.insert_cheese(cheese)
+            mongodb.insert_cheese(cheese)
             vector_db.upsert_cheese(cheese)
+
 upload_service = UploadService()

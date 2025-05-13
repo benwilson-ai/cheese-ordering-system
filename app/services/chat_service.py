@@ -7,7 +7,7 @@ from app.services.graph.graph_nodes import (
     determine_about_cheese,
     determine_database,
     query_transformation_node,
-    txt2sql_node,
+    txt2mongo_node,
     data_retrieval_node,
 )
 
@@ -23,7 +23,7 @@ class ChatService:
         workflow = StateGraph(state_schema=GraphState)
         
         # Add nodes
-        workflow.add_node("txt2sql", txt2sql_node)
+        workflow.add_node("txt2mongo", txt2mongo_node)
         workflow.add_node("data_retrieval", data_retrieval_node)
         workflow.add_node("query_transformation", query_transformation_node)
         # Add conditional edges
@@ -39,13 +39,13 @@ class ChatService:
             "query_transformation",
             determine_database,
             {
-                DatabaseEnum.MYSQL: "txt2sql",
+                DatabaseEnum.MONGO: "txt2mongo",
                 DatabaseEnum.VECTORDB: "data_retrieval"
             }
         )
 
         # Add edges
-        workflow.add_edge("txt2sql", "data_retrieval")
+        workflow.add_edge("txt2mongo", "data_retrieval")
         workflow.set_finish_point("data_retrieval")
         
         return workflow.compile()

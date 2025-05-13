@@ -1,5 +1,5 @@
 # from config import load_env, FIXTURES
-# from src.tools.db_utils import query_sql
+# from src.tools.db_utils import query_mongo
 
 # load_env()
 cheese = {
@@ -24,4 +24,4 @@ cheese = {
 temp = float(cheese.get('price').replace('$', '')) if cheese.get('price') else None,
 print(temp)
 # import_csv_to_vector(f"{FIXTURES}/retail-leases_2025-01-21_014339.csv")
-# query_sql("SELECT AVG(CurrentRentPa) AS average_rent FROM retail_leases WHERE CentreName LIKE '%Townsville%';")
+# query_mongo("SELECT AVG(CurrentRentPa) AS average_rent FROM retail_leases WHERE CentreName LIKE '%Townsville%';")
