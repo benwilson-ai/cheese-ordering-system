@@ -1,6 +1,4 @@
 import streamlit as st
-import pandas as pd
-import streamlit as st
 import logging
 from PIL import Image, ImageEnhance
 import time
@@ -9,7 +7,7 @@ import requests
 import base64
 from app.services.upload_service import upload_service
 from app.services.chat_service import chat_service
-import pandas as pd
+
 # Set page config with theme support
 st.set_page_config(
     page_title="Cheese Ordering Assistant",
@@ -242,16 +240,15 @@ def main():
             height: auto;
             padding: 3px;
             box-shadow: 
-                0 0 5px #330000,
-                0 0 10px #660000,
-                0 0 15px #990000,
-                0 0 20px #CC0000,
-                0 0 25px #FF0000,
-                0 0 30px #FF3333,
-                0 0 35px #FF6666;
+                0 0 5px #11000,
+                0 0 10px #220000,
+                0 0 15px #330000,
+                0 0 20px #40000,
+                0 0 25px #550000,
+                0 0 30px #663333,
+                0 0 35px #776666;
             position: relative;
             z-index: -1;
-            border-radius: 45px;
         }
         </style>
         """,
@@ -259,7 +256,7 @@ def main():
     )
 
     # Load and display sidebar image
-    img_path = "imgs/sidebar_streamly_avatar.png"
+    img_path = "imgs/graph.png"
     img_base64 = img_to_base64(img_path)
     if img_base64:
         st.sidebar.markdown(
@@ -389,100 +386,41 @@ for msg in st.session_state.messages:
         st.markdown(f'<div style="padding: 1em; border-radius: 1em; background: #23272f; color: #fff; margin-bottom: 0.5em;">{msg["content"]}</div>', unsafe_allow_html=True)
 
 if prompt := st.chat_input():
+    
+    
     with st.chat_message("user", avatar="imgs/stuser.png"):
         st.markdown(f'<div style="padding: 1em; border-radius: 1em; background: #2d3748; color: #fff; margin-bottom: 0.5em;">{prompt}</div>', unsafe_allow_html=True)
     st.session_state.messages.append({"role": "user", "content": prompt})
     # Show thinking indicator
     with st.spinner("Thinking..."):
         result = chat_service.process_message(prompt, st.session_state.messages)
+
     
     st.session_state.messages.append({"role": "assistant", "content": result["response"]})
     with st.chat_message("assistant", avatar="imgs/avatar_streamly.png"):
-        # Create HTML table with dark mode material/data grid style
-        if len(result["context"]) > 0:
-            html_table = """
-            <style>
-                .dark-table-container {
-                    background: #181c23;
-                    border-radius: 14px;
-                    box-shadow: 0 2px 12px rgba(0,0,0,0.25);
-                    padding: 0.5em 0.5em 0 0.5em;
-                    margin: 1.5em 0;
-                    overflow-x: auto;
-                }
-                .dark-table {
-                    width: 100%;
-                    border-collapse: separate;
-                    border-spacing: 0;
-                    font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
-                    color: #f3f6fa;
-                    background: #181c23;
-                    font-size: 1em;
-                    border-radius: 12px;
-                    overflow: hidden;
-                }
-                .dark-table thead th {
-                    position: sticky;
-                    top: 0;
-                    background: #23272f;
-                    color: #f3f6fa;
-                    font-weight: 700;
-                    padding: 14px 12px;
-                    border-bottom: 2px solid #31363f;
-                    z-index: 2;
-                    text-align: left;
-                    letter-spacing: 0.03em;
-                }
-                .dark-table tbody tr {
-                    transition: background 0.2s;
-                }
-                .dark-table tbody tr:nth-child(even) {
-                    background: #20242b;
-                }
-                .dark-table tbody tr:nth-child(odd) {
-                    background: #181c23;
-                }
-                .dark-table tbody tr:hover {
-                    background: #31363f;
-                }
-                .dark-table td {
-                    padding: 13px 12px;
-                    border-bottom: 1px solid #23272f;
-                    font-size: 0.98em;
-                    vertical-align: middle;
-                }
-                .dark-table tbody tr:last-child td {
-                    border-bottom: none;
-                }
-            </style>
-            <div class='dark-table-container'>
-            <table class="dark-table">
-            """
-            # Add header row
-            html_table += "<thead><tr>"
-            for key in result["context"][0].keys():
-                html_table += f"<th>{key.upper()}</th>"
-            html_table += "</tr></thead>"
-            # Add data rows
-            html_table += "<tbody>"
-            for row in result["context"]:
-                html_table += "<tr>"
-                for key in row.keys():
-                    value = row[key]
-                    if isinstance(value, dict):
-                        cell_content = "<br>".join(f"<b>{k}:</b> {v}" for k, v in value.items())
-                    elif isinstance(value, list):
-                        # Check if list contains image URLs
-                        if all(isinstance(item, str) and (item.startswith('http://') or item.startswith('https://')) for item in value):
-                            cell_content = ''.join(f"<img src='{item}' style='max-height:40px; max-width:60px; margin-right:6px; border-radius:6px; box-shadow:0 1px 4px #0002;'>" for item in value)
-                        else:
-                            cell_content = "<br>".join(str(item) for item in value)
-                    else:
-                        cell_content = value
-                    html_table += f"<td>{cell_content}</td>"
-                html_table += "</tr>"
-            html_table += "</tbody></table></div>"
-            st.html(html_table)
+        reason = result["reason"]
+        
+        # Display each reasoning step in a structured format
+        for idx, step in enumerate(reason, 1):
+            thought = step.get('thought', '')
+            plan = step.get('plan', '')
+            action = step.get('action', '')
+            observation = step.get('observation', '')
+            # Truncate observation to 20 characters
+            obs_short = (observation[:62] + '...') if len(observation) > 62 else observation
+
+            st.markdown(
+                f"""
+                <div style="padding: 1em; border-radius: 1em; background: #2d3748; color: #fff; margin-bottom: 0.5em;">
+                <b>Step {idx}.</b><br>
+                <b>Thought:</b> {thought}<br>
+                <b>Plan:</b> {plan}<br>
+                <b>Action:</b> {action}<br>
+                <b>Observation:</b> {obs_short}
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
         st.markdown(f'<div style="padding: 1em; border-radius: 1em; background: #23272f; color: #fff; margin-bottom: 0.5em;">{result["response"]}</div>', unsafe_allow_html=True)
 
 if __name__ == "__main__":
