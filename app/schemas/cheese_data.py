@@ -1,8 +1,10 @@
 from pydantic import BaseModel
 from datetime import date
 from typing import Optional
+from pydantic import BaseModel, ConfigDict, ValidationError
 
 class CheeseData(BaseModel):
+    model_config = ConfigDict(extra='forbid')
     _id: Optional[str] = None
     image_url: Optional[str] = None
     name: Optional[str] = None

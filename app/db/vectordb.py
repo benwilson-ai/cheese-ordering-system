@@ -2,6 +2,7 @@ from langchain_openai import OpenAIEmbeddings
 from pinecone.grpc import PineconeGRPC as Pinecone
 from pinecone import ServerlessSpec
 import uuid
+import json
 from app.core.config import settings, ModelType
 from app.schemas.cheese_data import CheeseData
 from typing import List
@@ -49,15 +50,15 @@ class VectorDBService:
         metadata['each_count'] = cheese['itemCounts']['EACH'] 
         metadata['each_dimension'] = cheese['dimensions']['EACH']
         metadata['each_weight'] = cheese['weights']['EACH']
-        metadata['each_price'] = cheese['prices'].get('Each', "")
+        metadata['each_price'] = cheese['prices'].get('EACH', "")
         if(cheese['itemCounts'].get('CASE', "")!=""):
             metadata['case_count'] = cheese['itemCounts'].get('CASE', "")
         if(cheese['dimensions'].get('CASE', "")!=""):
             metadata['case_dimension'] = cheese['dimensions'].get('CASE', "")
         if(cheese['weights'].get('CASE', "")!=""):
             metadata['case_weight'] = cheese['weights'].get('CASE', "")
-        if(cheese['prices'].get('Case', "")!=""):
-            metadata['case_price'] = cheese['prices'].get('Case', "")
+        if(cheese['prices'].get('CASE', "")!=""):
+            metadata['case_price'] = cheese['prices'].get('CASE', "")
         metadata['relateds'] = cheese['relateds']
         metadata['sku'] = cheese['sku']
         metadata['price_per'] = cheese['price_per']
@@ -76,12 +77,14 @@ class VectorDBService:
         self.index.upsert(vectors=vector)
         return embedding_id
 
-    def query(self, query_text: str, top_k: int = 5) -> List[CheeseData]:
+    def query(self, query_text: str, top_k: int = 5, filter: str = None) -> List[CheeseData]:
         vector = self.embed_model.embed_documents([query_text])[0]
         results = self.index.query(
             vector=vector,
             top_k=top_k,
-            include_metadata=True
+            filter=json.loads(filter),
+            include_metadata=True,
+            include_values=False,
         )
         return [CheeseData(**match['metadata']) for match in results['matches']]
 

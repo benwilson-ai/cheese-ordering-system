@@ -32,20 +32,12 @@ class MongoDBService:
         :param query: MongoDB query as a string. Should be a valid JSON string with double quotes.
         :return: List of query results.
         """
-        try:
             # First, try to parse the query as JSON to validate it
-            query_obj = json.loads(query)
-            
-            # Execute the aggregation pipeline
-            results = list(self.collection.aggregate(query_obj))
-            print(f"Query executed successfully. Found {len(results)} results.")
-            return results
-        except json.JSONDecodeError as e:
-            print(f"Invalid JSON query format: {e}")
-            raise
-        except Exception as e:
-            print(f"Error executing MongoDB query: {e}")
-            raise
-
+        query_obj = json.loads(query)
+        
+        # Execute the aggregation pipeline
+        results = list(self.collection.aggregate(query_obj))
+        # print(f"Query executed successfully. Found {len(results)} results.")
+        return results
 
 mongodb = MongoDBService()
