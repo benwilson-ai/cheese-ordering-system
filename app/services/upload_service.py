@@ -133,7 +133,7 @@ def scrape_cheese_department():
                         brand_elem = card.find_element(By.CLASS_NAME, 'css-w6ttxb')
                         
                         # Get product URL
-                        product_url = card.get_attribute('href')
+                        product_url = card.get_attribute('product_url')
                         
                         product_data = {
                             'cheese_type': name_elem.text.strip() if name_elem else 'N/A',
@@ -226,35 +226,7 @@ class UploadService:
         json_data = json.load(file)
         
         # Process each product in the JSON
-        for idx, product in enumerate(json_data['products']):
-            # Extract product info
-            product_info = product.get('product_info', {})
-            case_info = product_info.get('case', {})
-            each_info = product_info.get('each', {})
-            
-            # Create CheeseData object
-            cheese = CheeseData(
-                id=idx + 1,  # Generate sequential IDs
-                type=product.get('cheese_type'),
-                form=product.get('cheese_form'),
-                brand=product.get('brand'),
-                price=float(product.get('price').replace('$', '')) if product.get('price') else None,
-                price_per_lb=product.get('price_per_lb', None),
-                case_count=float(case_info.get('count', '0').split()[0]) if case_info.get('count') else None,
-                case_volume=case_info.get('volume', None),
-                case_weight=case_info.get('weight', None),
-                each_count=float(each_info.get('count', '0').split()[0]) if each_info.get('count') else None,
-                each_volume='L 1\" x W 1\" x H 1\"',
-                each_weight=each_info.get('weight'),
-                sku=int(product.get('sku', 0)),
-                upc=int(product.get('upc', 0)),
-                image_url=product.get('image_url'),
-                product_url=product.get('product_url'),
-                wholesale=product.get('bonus', "It has no wholesale price"),
-                out_of_stock=product.get('price', "BACK IN STOCK SOON")
-            )
-            
-            # Store in both databases
+        for cheese in json_data:
             mongodb.insert_cheese(cheese)
             vector_db.upsert_cheese(cheese)
     

@@ -47,8 +47,18 @@ class ChatService:
         # Add edges
         workflow.add_edge("txt2mongo", "data_retrieval")
         workflow.set_finish_point("data_retrieval")
+        app = workflow.compile()
         
-        return workflow.compile()
+        # Save graph visualization to a file
+        try:
+            from langchain_core.runnables.graph_mermaid import MermaidDrawMethod
+            mermaid_code = app.get_graph().draw_mermaid()
+            print(mermaid_code)
+            
+        except Exception as e:
+            print(f"Warning: Could not save graph visualization: {str(e)}")
+            
+        return app
 
     def process_message(self, query: str, conversation_history: List[Dict[str, str]]) -> str:
         messages = conversation_history + [{"role": "user", "content": query}]
