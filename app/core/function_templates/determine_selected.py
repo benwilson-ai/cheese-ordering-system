@@ -1,28 +1,9 @@
 import json
 
-function_list = [
-    {
+function_list = {
         "type": "function",
         "function": {
-            "name": "determine_is_available",
-            "description": "This function is using conversation between user and assistant as input and determine whether user is asking about cheese or not",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "is_available": {
-                        "type": "string",
-                        "enum": ["yes", "no", "unknown"],
-                        "description": "If user is asking about cheese you have this property returns 'yes', and if user is not asking about cheese or insulting you is good return 'no'"
-                    }
-                },
-                "required": ["is_available"]
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "determine_mongo_or_vector",
+            "name": "determine_selected",
             "description": "This function is using conversation between user and assistant as input and determine whether using mongoDB is good or using vectordb is good",
             "parameters": {
                 "type": "object",
@@ -36,7 +17,6 @@ function_list = [
                 "required": ["is_mongo"]
             }
         }
-    }
-]
+}
 
-mongo_vector_tool = json.loads(json.dumps(function_list))
+determine_selected = json.loads(json.dumps(function_list))
