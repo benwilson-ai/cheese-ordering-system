@@ -7,7 +7,7 @@ from app.services.graph.graph_nodes import (
     determine_about_cheese,
     determine_database,
     query_transformation_node,
-    txt2sql_node,
+    txt2mongo_node,
     data_retrieval_node,
 )
 
@@ -23,7 +23,7 @@ class ChatService:
         workflow = StateGraph(state_schema=GraphState)
         
         # Add nodes
-        workflow.add_node("txt2sql", txt2sql_node)
+        workflow.add_node("txt2mongo", txt2mongo_node)
         workflow.add_node("data_retrieval", data_retrieval_node)
         workflow.add_node("query_transformation", query_transformation_node)
         # Add conditional edges
@@ -39,23 +39,32 @@ class ChatService:
             "query_transformation",
             determine_database,
             {
-                DatabaseEnum.MYSQL: "txt2sql",
+                DatabaseEnum.MONGO: "txt2mongo",
                 DatabaseEnum.VECTORDB: "data_retrieval"
             }
         )
 
         # Add edges
-        workflow.add_edge("txt2sql", "data_retrieval")
+        workflow.add_edge("txt2mongo", "data_retrieval")
         workflow.set_finish_point("data_retrieval")
+        app = workflow.compile()
         
-        return workflow.compile()
+        # Save graph visualization to a file
+        try:
+            from langchain_core.runnables.graph_mermaid import MermaidDrawMethod
+            mermaid_code = app.get_graph().draw_mermaid()
+            print(mermaid_code)
+            
+        except Exception as e:
+            print(f"Warning: Could not save graph visualization: {str(e)}")
+            
+        return app
 
     def process_message(self, query: str, conversation_history: List[Dict[str, str]]) -> str:
         messages = conversation_history + [{"role": "user", "content": query}]
         initial_state = GraphState(messages=messages, query=query)
         
         final_state = self.data_retrieval_graph.invoke(initial_state)
-        print(final_state)
         # Check if visualization is needed
         # if "compare" in query.lower() or "chart" in query.lower():
         return {"response": final_state["messages"][-1]["content"], "context": final_state['raw_data']}

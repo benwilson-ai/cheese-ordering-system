@@ -9,6 +9,7 @@ import requests
 import base64
 from app.services.upload_service import upload_service
 from app.services.chat_service import chat_service
+import pandas as pd
 # Set page config with theme support
 st.set_page_config(
     page_title="Cheese Ordering Assistant",
@@ -397,8 +398,92 @@ if prompt := st.chat_input():
     
     st.session_state.messages.append({"role": "assistant", "content": result["response"]})
     with st.chat_message("assistant", avatar="imgs/avatar_streamly.png"):
-        # st.markdown(f'<div style="padding: 1em; border-radius: 1em; background: #23272f; color: #fff; margin-bottom: 0.5em;">{result["context"]}</div>', unsafe_allow_html=True)
+        # Create HTML table with dark mode material/data grid style
+        if len(result["context"]) > 0:
+            html_table = """
+            <style>
+                .dark-table-container {
+                    background: #181c23;
+                    border-radius: 14px;
+                    box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+                    padding: 0.5em 0.5em 0 0.5em;
+                    margin: 1.5em 0;
+                    overflow-x: auto;
+                }
+                .dark-table {
+                    width: 100%;
+                    border-collapse: separate;
+                    border-spacing: 0;
+                    font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+                    color: #f3f6fa;
+                    background: #181c23;
+                    font-size: 1em;
+                    border-radius: 12px;
+                    overflow: hidden;
+                }
+                .dark-table thead th {
+                    position: sticky;
+                    top: 0;
+                    background: #23272f;
+                    color: #f3f6fa;
+                    font-weight: 700;
+                    padding: 14px 12px;
+                    border-bottom: 2px solid #31363f;
+                    z-index: 2;
+                    text-align: left;
+                    letter-spacing: 0.03em;
+                }
+                .dark-table tbody tr {
+                    transition: background 0.2s;
+                }
+                .dark-table tbody tr:nth-child(even) {
+                    background: #20242b;
+                }
+                .dark-table tbody tr:nth-child(odd) {
+                    background: #181c23;
+                }
+                .dark-table tbody tr:hover {
+                    background: #31363f;
+                }
+                .dark-table td {
+                    padding: 13px 12px;
+                    border-bottom: 1px solid #23272f;
+                    font-size: 0.98em;
+                    vertical-align: middle;
+                }
+                .dark-table tbody tr:last-child td {
+                    border-bottom: none;
+                }
+            </style>
+            <div class='dark-table-container'>
+            <table class="dark-table">
+            """
+            # Add header row
+            html_table += "<thead><tr>"
+            for key in result["context"][0].keys():
+                html_table += f"<th>{key.upper()}</th>"
+            html_table += "</tr></thead>"
+            # Add data rows
+            html_table += "<tbody>"
+            for row in result["context"]:
+                html_table += "<tr>"
+                for key in row.keys():
+                    value = row[key]
+                    if isinstance(value, dict):
+                        cell_content = "<br>".join(f"<b>{k}:</b> {v}" for k, v in value.items())
+                    elif isinstance(value, list):
+                        # Check if list contains image URLs
+                        if all(isinstance(item, str) and (item.startswith('http://') or item.startswith('https://')) for item in value):
+                            cell_content = ''.join(f"<img src='{item}' style='max-height:40px; max-width:60px; margin-right:6px; border-radius:6px; box-shadow:0 1px 4px #0002;'>" for item in value)
+                        else:
+                            cell_content = "<br>".join(str(item) for item in value)
+                    else:
+                        cell_content = value
+                    html_table += f"<td>{cell_content}</td>"
+                html_table += "</tr>"
+            html_table += "</tbody></table></div>"
+            st.html(html_table)
         st.markdown(f'<div style="padding: 1em; border-radius: 1em; background: #23272f; color: #fff; margin-bottom: 0.5em;">{result["response"]}</div>', unsafe_allow_html=True)
 
 if __name__ == "__main__":
-    main()    
+    main()

@@ -1,13 +1,13 @@
 # Cheeses Ordering AI Assistant
 
-A Streamlit-based chatbot application powered by OpenAI that helps users analyze and understand retail cheese data. The application combines vector similarity search and SQL querying capabilities to provide comprehensive insights about retail cheeses.
+A Streamlit-based chatbot application powered by OpenAI that helps users analyze and understand retail cheese data. The application combines vector similarity search and mongo querying capabilities to provide comprehensive insights about retail cheeses.
 
 ## Features
 
 - 📊 CSV file upload and processing
 - 💬 Interactive chat interface
 - 📈 Data visualization capabilities
-- 🔍 Hybrid search (SQL + Vector) for cheese information
+- 🔍 Hybrid search (mongo + Vector) for cheese information
 - 🤖 AI-powered natural language understanding
 - 📋 Comprehensive cheese data management
 
@@ -16,7 +16,7 @@ A Streamlit-based chatbot application powered by OpenAI that helps users analyze
 - **Frontend**: Streamlit
 - **Backend**: Python
 - **Databases**:
-  - MySQL (Structured data storage)
+  - mongo (Structured data storage)
   - Pinecone (Vector database for semantic search)
 - **AI/ML**:
   - OpenAI GPT-4
@@ -26,7 +26,7 @@ A Streamlit-based chatbot application powered by OpenAI that helps users analyze
 ## Prerequisites
 
 - Python 3.8+
-- MySQL Server (We used [Aiven sql database](https://aiven.io/) for this project)
+- mongo Server (We used [Aiven mongo database](https://aiven.io/) for this project)
 - Pinecone Account
 - OpenAI API Key
 
@@ -64,7 +64,7 @@ cp .env.example .env
 │   │   ├── logging.py         # Logging setup
 │   │   └── prompt_templates/  # LLM prompt templates
 │   ├── db/
-│   │   ├── mysql.py          # MySQL database service
+│   │   ├── mongo.py          # mongo database service
 │   │   └── vectordb.py       # Pinecone vector database service
 │   ├── schemas/
 │   │   └── retail_lease.py   # Data models
@@ -96,13 +96,13 @@ streamlit run main.py
 
 ### Data Upload
 The application supports CSV file upload with automatic encoding detection and data processing. The data is simultaneously stored in:
-- MySQL for structured queries
+- mongo for structured queries
 - Pinecone for semantic search capabilities
 
 ### Chat Interface
 The chat interface uses a sophisticated workflow powered by LangGraph to:
 1. Transform user queries into appropriate database queries
-2. Determine the best database to use (MySQL or Pinecone)
+2. Determine the best database to use (mongo or Pinecone)
 3. Execute queries and retrieve relevant data
 4. Generate natural language responses
 5. Create visualizations when appropriate
