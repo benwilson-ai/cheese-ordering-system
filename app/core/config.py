@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     DB_PASSWORD: str
     DB_NAME: str
     DB_PORT: int = 27017  # Default MongoDB port
-    
+    DB_URI: str
     # Pinecone settings
     PINECONE_API_KEY: str
     PINECONE_INDEX_NAME: str

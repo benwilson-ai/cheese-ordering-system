@@ -8,7 +8,7 @@ from typing import Dict, Any, List
 class MongoDBService:
     def __init__(self):
         self.client = MongoClient(
-            "mongodb+srv://tannergregg38:b52vQT282LvpXw1H@cluster0.pwnh0r4.mongodb.net/"
+           settings.DB_URI
         )
         self.db = self.client["auto-food-order"]
         self.collection = self.db["cheese"]
