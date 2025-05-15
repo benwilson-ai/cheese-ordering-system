@@ -74,6 +74,7 @@ def txt2mongo_node(state: GraphState) -> GraphState:
 
 def data_retrieval_node(state: GraphState) -> GraphState:
     try:
+        results = []
         if state.database == DatabaseEnum.MONGO:
             print("MONGO QUERY: ", state.mongo_query)
             results = mongodb.query(state.mongo_query)
