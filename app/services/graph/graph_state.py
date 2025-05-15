@@ -16,7 +16,7 @@ class Message(BaseModel):
 
 class GraphState(BaseModel):
     messages: List[Dict[str, str]]
-    database: Optional[DatabaseEnum] = DatabaseEnum.MONGO
+    database: Optional[DatabaseEnum] = DatabaseEnum.VECTORDB
     query: Optional[str] = None
     mongo_query: Optional[str] = None
     raw_data: Optional[List[Dict]] = None

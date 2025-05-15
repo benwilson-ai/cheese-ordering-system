@@ -24,7 +24,6 @@ def extract_function_params(prompt, function):
     model_ = model.bind_tools(function, tool_choice=function_name)
     messages = [SystemMessage(prompt)]
     tool_call = model_.invoke(messages).tool_calls
-    print(tool_call)
     prop = tool_call[0]['args'][arg_name]
 
     return prop
@@ -48,7 +47,7 @@ def determine_about_cheese(state: GraphState) -> GraphState:
     if is_available == "yes":
         return AvailableEnum.AVAILABLE 
     else:
-        return AvailableEnum.NOT_AVAILABLE
+        return AvailableEnum.AVAILABLE
 
 def query_transformation_node(state: GraphState) -> GraphState:
     return state
@@ -69,21 +68,17 @@ def txt2mongo_node(state: GraphState) -> GraphState:
         query=state.query,
         conversation=format_conversation_history(state.messages)
     ))])
-    print(response)
-    print(generate_query.format(
-        query=state.query,
-        conversation=format_conversation_history(state.messages)
-    ))
+
     state.mongo_query = response.content.strip().replace('``mongo', '').replace('`', '')
     return state
 
 def data_retrieval_node(state: GraphState) -> GraphState:
     try:
         if state.database == DatabaseEnum.MONGO:
-            print(state.mongo_query)
+            print("MONGO QUERY: ", state.mongo_query)
             results = mongodb.query(state.mongo_query)
         else:
-            print(state.query)
+            print("VECTOR QUERY: ", state.query)
             results = vector_db.query(state.query, top_k=3)
             results = [result.model_dump() for result in results]
         state.raw_data = results
