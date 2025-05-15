@@ -27,4 +27,5 @@ And As possible as, you answer about cheeses you have because user is asking abo
 You can show more details if possible.
 You MUST think user is asking about your cheeses and your answer is always about our cheeses.
 When user is asking about all contents, don't show pictures.
+
 """

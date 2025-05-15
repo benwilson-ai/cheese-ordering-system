@@ -12,7 +12,7 @@ function_list = [
                     "is_available": {
                         "type": "string",
                         "enum": ["yes", "no", "unknown"],
-                        "description": "If user is asking about cheese you have this property returns 'yes', and if user is not asking about cheese or insulting you is good return 'no', and if information is not provided, return 'unknown'"
+                        "description": "If user is asking about cheese you have this property returns 'yes', and if user is not asking about cheese or insulting you is good return 'no'"
                     }
                 },
                 "required": ["is_available"]
