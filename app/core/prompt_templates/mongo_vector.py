@@ -216,7 +216,7 @@ User Question: List the top 5 most expensive cheeses that are currently in stock
   }},
   {{
     $sort: {{
-      priceOrder: -1
+      priceOrder: 1
     }}
   }},
   {{
