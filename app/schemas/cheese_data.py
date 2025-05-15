@@ -3,23 +3,28 @@ from datetime import date
 from typing import Optional
 
 class CheeseData(BaseModel):
-    id: Optional[int] = None
-    type: Optional[str] = None
-    form: Optional[str] = None
-    brand: Optional[str] = None
-    price: Optional[float] = None
-    price_per_lb: Optional[str] = None
-    case_count: Optional[int] = None
-    case_volume: Optional[str] = None
-    case_weight: Optional[str] = None
-    each_count: Optional[int] = None
-    each_volume: Optional[str] = None
-    each_weight: Optional[str] = None
-    sku: Optional[int] = None               
-    upc: Optional[int] = None
+    _id: Optional[str] = None
     image_url: Optional[str] = None
+    name: Optional[str] = None
+    brand: Optional[str] = None
+    department: Optional[str] = None
+    each_itemCount: Optional[int] = None
+    case_itemCount: Optional[int] = None
+    each_dimension: Optional[str] = None
+    case_dimension: Optional[str] = None
+    each_weight: Optional[float] = None
+    case_weight: Optional[float] = None
+    more_image_url: Optional[list[str]] = None
+    relateds: Optional[list[str]] = None
+    each_price: Optional[float] = None
+    case_price: Optional[float] = None
+    price_per: Optional[float] = None
+    sku: Optional[str] = None               
+    wholesale: Optional[int] = None
+    out_of_stock: Optional[bool] = None
     product_url: Optional[str] = None
-    wholesale: Optional[str] = None
-    out_of_stock: Optional[str] = None
+    priceOrder: Optional[int] = None
+    popularityOrder: Optional[int] = None
+    weight_unit: Optional[str] = None
     class Config:
         from_attributes = True
