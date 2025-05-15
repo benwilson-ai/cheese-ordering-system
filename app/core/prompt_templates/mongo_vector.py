@@ -278,6 +278,7 @@ User Question: Get all cheeses whose price per lb is between 3 and 5, and sort b
 ]
 '''
 Please generate mongo query to gather information for following query.
+You must generate query so that it can be executed by aggregate(json.loads(query))
 The query is as follows.
 {query}
 

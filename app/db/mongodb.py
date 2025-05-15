@@ -4,6 +4,7 @@ from pymongo import MongoClient
 from app.core.config import settings
 from app.schemas.cheese_data import CheeseData
 from typing import Dict, Any, List
+
 class MongoDBService:
     def __init__(self):
         self.client = MongoClient(
@@ -24,19 +25,24 @@ class MongoDBService:
             cheese
         )
     
-    def query(self, query: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def query(self, query: str) -> List[Dict[str, Any]]:
         """
-        Execute a MongoDB query with optional sorting and return the results.
+        Execute a MongoDB query and return the results.
 
-        :param query: MongoDB query to execute.
-        :param sort: Sorting criteria as a dictionary (e.g., {"field_name": 1} for ascending).
+        :param query: MongoDB query as a string. Should be a valid JSON string with double quotes.
         :return: List of query results.
         """
         try:
+            # First, try to parse the query as JSON to validate it
+            query_obj = json.loads(query)
             
-            results = list(self.collection.aggregate(json.loads(query)))
+            # Execute the aggregation pipeline
+            results = list(self.collection.aggregate(query_obj))
             print(f"Query executed successfully. Found {len(results)} results.")
             return results
+        except json.JSONDecodeError as e:
+            print(f"Invalid JSON query format: {e}")
+            raise
         except Exception as e:
             print(f"Error executing MongoDB query: {e}")
             raise

@@ -65,7 +65,6 @@ class ChatService:
         initial_state = GraphState(messages=messages, query=query)
         
         final_state = self.data_retrieval_graph.invoke(initial_state)
-        print(final_state)
         # Check if visualization is needed
         # if "compare" in query.lower() or "chart" in query.lower():
         return {"response": final_state["messages"][-1]["content"], "context": final_state['raw_data']}
