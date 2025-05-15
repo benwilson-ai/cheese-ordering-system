@@ -1,3 +1,4 @@
+import json
 from typing import List
 from pymongo import MongoClient
 from app.core.config import settings
@@ -6,30 +7,24 @@ from typing import Dict, Any, List
 class MongoDBService:
     def __init__(self):
         self.client = MongoClient(
-            host=settings.DB_HOST,
-            port=settings.DB_PORT,
-            username=settings.DB_USER,
-            password=settings.DB_PASSWORD
+            "mongodb+srv://tannergregg38:b52vQT282LvpXw1H@cluster0.pwnh0r4.mongodb.net/"
         )
-        self.db = self.client[settings.DB_NAME]
-        self.collection = self.db.cheese_data
+        self.db = self.client["auto-food-order"]
+        self.collection = self.db["cheese"]
 
     def initialize(self):
         """Create indexes for the cheese_data collection"""
-        self.collection.create_index("id", unique=True)
+        self.collection.create_index("_id", unique=True)
         self.collection.create_index("sku", unique=True)
-        self.collection.create_index("upc", unique=True)
 
-    def insert_cheese(self, cheese: CheeseData):
+    def insert_cheese(self, cheese):
         """Insert or update a cheese document"""
-        cheese_dict = cheese.model_dump(exclude_none=True)
-        self.collection.update_one(
-            {"id": cheese.id},
-            {"$set": cheese_dict},
-            upsert=True
+        # cheese_dict = cheese.model_dump(exclude_none=True)
+        self.collection.insert_one(
+            cheese
         )
-
-    def query(self, query: Dict[str, Any], sort: Dict[str, int] = None) -> List[Dict[str, Any]]:
+    
+    def query(self, query: Dict[str, Any]) -> List[Dict[str, Any]]:
         """
         Execute a MongoDB query with optional sorting and return the results.
 
@@ -38,11 +33,8 @@ class MongoDBService:
         :return: List of query results.
         """
         try:
-            print(f"Executing query: {query}, with sort: {sort}")
-            if sort:
-                results = list(self.collection.find(query).sort(list(sort.items())))
-            else:
-                results = list(self.collection.find(query))
+            
+            results = list(self.collection.aggregate(json.loads(query)))
             print(f"Query executed successfully. Found {len(results)} results.")
             return results
         except Exception as e:
