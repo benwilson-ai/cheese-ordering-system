@@ -11,15 +11,14 @@ from app.core.prompt_templates.generate_mongodb_query import generate_mongodb_qu
 from app.core.prompt_templates.generate_response import generate_response
 from app.core.function_templates.determine_selected import determine_selected
 from .graph_state import GraphState
-from langsmith.wrappers import wrap_openai
 from langsmith import traceable
 import json
 
-model = wrap_openai(ChatOpenAI(
+model = ChatOpenAI(
     model=ModelType.gpt4o,
     openai_api_key=settings.OPENAI_API_KEY, 
     temperature=0.3,
-))
+)
 
 # def extract_function_params(prompt, function):
 #     function_name = function["function"]["name"]
