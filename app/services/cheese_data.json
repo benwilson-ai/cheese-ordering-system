@@ -1,8 +1,4 @@
-{
-    "scraped_at": "2025-05-08 23:44:50",
-    "total_products": 98,
-    "total_pages": 4,
-    "products": [
+[
         {
             "cheese_type": "Cheese, Mozzarella, Wmlm, Feather Shred, Nb, 4/5 Lb - 124254",
             "image_url": "https://shop.kimelo.com/_next/image?url=https%3A%2F%2Fd3tlizm80tjdt4.cloudfront.net%2Fremote_images%2Fimage%2F2114%2Fsmall%2Fb41784f854f03efedc29d73d0a248d0dac389d704b7101205d.jpg&w=3840&q=50",
@@ -1889,5 +1885,4 @@
                 }
             }
         }
-    ]
-}
+]
