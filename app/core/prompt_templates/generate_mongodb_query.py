@@ -6,7 +6,7 @@ Document Structure:
 '''
 {{
     "image_url": "String",         // cheese image url. You can use this url to show the cheese image in the frontend using <img src="image_url" />
-    "name": "String",              // cheese name
+    "name": "String",              // cheese name contains product location such as Greek, Swiss, etc. and cheese type such as goat or milk
     "brand": "String",   // cheese brand
     "department": "String",              // cheese department or category
     "itemCounts": {{"CASE": "Int", "EACH": "Int"}},          //  item counts in case and each product.
@@ -74,10 +74,10 @@ Here is an example of cheese document.
 Please generate mongo query to gather information for following query.
 
 The query is as follows.
-{query}
+{{query}}
 
 Here is the original conversation.
-{conversation}
+{{conversation}}
 
 Key Instructions:
 1. Comprehension of the question: Carefully analyze the user natural language question to identify:
@@ -99,33 +99,33 @@ User Question: I would like to know the names, brands and prices of the most pop
 
 [
   {{
-    $sort: {{ popularityOrder: 1 }}
+    "$sort": {{ "popularityOrder": 1 }}
   }},
   {{
-    $limit: 1
-  }},
+    "$limit": 1
+  }}, 
   {{
-    $project: {{
-      relateds: 1
+    "$project": {{
+      "relateds": 1
     }}
   }},
   {{
-    $lookup: {{
-      from: "cheese",
-      localField: "relateds",
-      foreignField: "sku",
-      as: "related_cheeses"
+    "$lookup": {{
+      "from": "cheese",
+      "localField": "relateds",
+      "foreignField": "sku",
+      "as": "related_cheeses"
     }}
   }},
   {{
-    $unwind: "$related_cheeses"
+    "$unwind": "$related_cheeses"
   }},
   {{
-    $project: {{
-      _id: 0,
-      name: "$related_cheeses.name",
-      brand: "$related_cheeses.brand",
-      prices: "$related_cheeses.prices"
+    "$project": {{
+      "_id": 0,
+      "name": "$related_cheeses.name",
+      "brand": "$related_cheeses.brand",
+      "prices": "$related_cheeses.prices"
     }}
   }}
 ]
@@ -134,47 +134,47 @@ User Question: If you have wholesale cheese, I'd like to buy 11, how much would 
 
 [
   {{
-    $match: {{
-      wholesale: {{
-        $ne: null
+    "$match": {{
+      "wholesale": {{
+        "$ne": null
       }},
-      out_of_stock: false
+      "out_of_stock": false
     }}
   }},
   {{
-    $project: {{
-      _id: 0,
-      name: 1,
-      wholesale: 1,
-      quantity: {{
-        $literal: 11
+    "$project": {{
+      "_id": 0,
+      "name": 1,
+      "wholesale": 1,
+      "quantity": {{
+        "$literal": 11
       }},
-      total_cost: {{
-        $multiply: [11, "$wholesale"]
+      "total_cost": {{
+        "$multiply": [11, "$wholesale"]
       }}
     }}
   }},
-	{{ $sort: {{ total_cost: 1 }} }},
-	{{ $limit: 1 }}
+	{{ "$sort": {{ "total_cost": 1 }} }},
+	{{ "$limit": 1 }}
 ]
 Example 3:
 User Question: What is the cheapest cheese?
 
 [
   {{
-    $match: {{
-      priceOrder: -1
+    "$match": {{
+      "priceOrder": -1
     }}
   }},
   {{
-    $limit: 1
+    "$limit": 1
   }},
   {{
-    $project: {{
-      _id: 0,
-      name: 1,
-      prices: 1,
-      brand: 1
+    "$project": {{
+      "_id": 0,
+      "name": 1,
+      "prices": 1,
+      "brand": 1
     }}
   }}
 ]
@@ -184,20 +184,20 @@ User Question: Find cheeses with more than one image url and return their name a
 
 [
   {{
-    $addFields: {{
-      imageCount: {{ $size: "$more_image_url" }}
+    "$addFields": {{
+      "imageCount": {{ "$size": "$more_image_url" }}
     }}
   }},
   {{
-    $match: {{
-      imageCount: {{ $gt: 1 }}
+    "$match": {{
+      "imageCount": {{ "$gt": 1 }}
     }}
   }},
   {{
-    $project: {{
-      _id: 0,
-      name: 1,
-      imageCount: 1
+    "$project": {{
+      "_id": 0,
+      "name": 1,
+      "imageCount": 1
     }}
   }}
 ]
@@ -207,43 +207,41 @@ User Question: Find all cheeses that have at least 2 related cheeses and show th
 
 [
   {{
-    $match: {{
-      $expr: {{ $gte: [{{ $size: "$relateds" }}, 2] }}
+    "$match": {{
+      "$expr": {{ "$gte": [{{ "$size": "$relateds" }}, 2] }}
     }}
   }},
   {{
-    $project: {{
-      _id: 0,
-      name: 1,
-      relateds: 1
+    "$project": {{
+      "_id": 0,
+      "name": 1,
+      "relateds": 1
     }}
   }}
 ]
 
 
 Example 6:
-User Question: List the top 5 most expensive cheeses that are currently in stock, showing their name, brand, price, and image.
+User Question: Can you show me all goat cheese?
 
 [
   {{
-    $match: {{
-      out_of_stock: false
+    "$match": {{
+      "name": {{
+        "$regex": "goat",
+        "$options": "i"
+      }}
     }}
   }},
   {{
-    $sort: {{
-      priceOrder: 1
-    }}
-  }},
-  {{
-    $limit: 5
-  }},
-  {{
-    $project: {{
-      _id: 0,
-      name: 1,
-      brand: 1,
-      image_url: 1
+    "$project": {{
+      "_id": 0,
+      "name": 1,
+      "brand": 1,
+      "prices": 1,
+      "image_url": 1,
+      "product_url": 1,
+      "out_of_stock": 1
     }}
   }}
 ]
@@ -253,17 +251,17 @@ User Question: I want to know all cheese's name and price and weight heavier tha
 
 [
   {{
-    $match: {{
-      weight_unit: "lb",
-      "weights.CASE": {{ $gt: 100 }}
+    "$match": {{
+      "weight_unit": "lb",
+      "weights.CASE": {{ "$gt": 100 }}
     }}
   }},
   {{
-    $project: {{
-      _id: 0,
-      name: 1,
-      prices: 1,
-      case_weight: "$weights.CASE"
+    "$project": {{
+      "_id": 0,
+      "name": 1,
+      "prices": 1,
+      "case_weight": "$weights.CASE"
     }}
   }}
 ]
@@ -273,22 +271,22 @@ User Question: Get all cheeses whose price per lb is between 3 and 5, and sort b
 
 [
   {{
-    $match: {{
-      price_per: {{ $gte: 3, $lte: 5 }},
-      weight_unit: "lb"
+    "$match": {{
+      "price_per": {{ "$gte": 3, "$lte": 5 }},
+      "weight_unit": "lb"
     }}
   }},
   {{
-    $project: {{
-      _id: 0,
-      name: 1,
-      price_per: 1,
-      popularityOrder: 1
+    "$project": {{
+      "_id": 0,
+      "name": 1,
+      "price_per": 1,
+      "popularityOrder": 1
     }}
   }},
   {{
-    $sort: {{
-      popularityOrder: 1
+    "$sort": {{
+      "popularityOrder": 1
     }}
   }}
 ]

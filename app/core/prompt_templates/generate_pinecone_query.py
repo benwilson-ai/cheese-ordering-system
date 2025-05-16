@@ -7,6 +7,7 @@ You will work specifically with the cheese collection, whose record metadata str
 Record Metadata Structure:
 '''
 {{
+  "name": "String",                  // cheese name contains product location such as Greek, Swiss, etc. and cheese type such as goat or milk
   "brand": "String",                  // cheese brand
   "case_count": "Int",               // number of items in a case
   "case_dimension": "String",        // dimensions of the case product
@@ -19,7 +20,6 @@ Record Metadata Structure:
   "each_weight": "Double",           // weight of each product
   "image_url": "String",             // image URL of the cheese
   "more_image_url": "Array",         // additional image URLs
-  "name": "String",                  // cheese name
   "out_of_stock": "Boolean",         // whether the cheese is out of stock
   "popularityOrder": "Int",          // popularity ranking
   "priceOrder": "Int",               // price ranking
