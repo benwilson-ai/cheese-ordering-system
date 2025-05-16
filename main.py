@@ -400,26 +400,90 @@ if prompt := st.chat_input():
     with st.chat_message("assistant", avatar="imgs/avatar_streamly.png"):
         reason = result["reason"]
         
-        # Display each reasoning step in a structured format
+        # Inject CSS for reasoning steps only once
+        st.html(
+            """
+            <style>
+            .reasoning-steps-container {
+                margin-top: 1.5em;
+                margin-bottom: 1.5em;
+            }
+            .reasoning-step {
+                padding: 1.5em;
+                border-radius: 12px;
+                background: linear-gradient(145deg, #2d4758, #1e2f3d);
+                color: #fff;
+                margin-bottom: 1.2em;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                transition: transform 0.2s ease;
+            }
+            .reasoning-step:hover {
+                transform: translateY(-2px) scale(1.01);
+                box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+            }
+            .step-header {
+                font-size: 1.15em;
+                font-weight: 700;
+                color: #4fc3f7;
+                margin-bottom: 0.7em;
+                border-bottom: 2px solid rgba(79, 195, 247, 0.18);
+                padding-bottom: 0.4em;
+                letter-spacing: 0.5px;
+            }
+            .reasoning-content {
+                display: grid;
+                gap: 0.7em;
+            }
+            .reasoning-item {
+                display: flex;
+                flex-direction: column;
+                gap: 0.2em;
+            }
+            .reasoning-label {
+                font-weight: 600;
+                color: #81d4fa;
+                font-size: 0.93em;
+            }
+            .reasoning-value {
+                color: #e3f2fd;
+                line-height: 1.5;
+                font-size: 1em;
+            }
+            </style>
+            <div class='reasoning-steps-container'></div>
+            """
+        )
         for idx, step in enumerate(reason, 1):
             thought = step.get('thought', '')
             plan = step.get('plan', '')
             action = step.get('action', '')
             observation = step.get('observation', '')
-            # Truncate observation to 20 characters
             obs_short = (observation[:300] + '...') if len(observation) > 300 else observation
-
-            st.markdown(
+            st.html(
                 f"""
-                <div style="padding: 1em; border-radius: 1em; background: #2d4758; color: #fff; margin-bottom: 0.5em;">
-                <b>Step {idx}.</b><br>
-                <b>Thought:</b> {thought}<br>
-                <b>Plan:</b> {plan}<br>
-                <b>Action:</b> {action}<br>
-                <b>Observation:</b> {obs_short}
+                <div class='reasoning-step'>
+                    <div class='step-header'>Step {idx}</div>
+                    <div class='reasoning-content'>
+                        <div class='reasoning-item'>
+                            <span class='reasoning-label'>Thought</span>
+                            <span class='reasoning-value'>{thought}</span>
+                        </div>
+                        <div class='reasoning-item'>
+                            <span class='reasoning-label'>Plan</span>
+                            <span class='reasoning-value'>{plan}</span>
+                        </div>
+                        <div class='reasoning-item'>
+                            <span class='reasoning-label'>Action</span>
+                            <span class='reasoning-value'>{action}</span>
+                        </div>
+                        <div class='reasoning-item'>
+                            <span class='reasoning-label'>Observation</span>
+                            <span class='reasoning-value'>{obs_short}</span>
+                        </div>
+                    </div>
                 </div>
-                """,
-                unsafe_allow_html=True
+                """
             )
         st.markdown(f'<div style="padding: 1em; border-radius: 1em; background: #23272f; color: #fff; margin-bottom: 0.5em;">{result["response"]}</div>', unsafe_allow_html=True)
 

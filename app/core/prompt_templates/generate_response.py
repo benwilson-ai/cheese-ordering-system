@@ -26,8 +26,8 @@ KEEP IN MIND:
    - When the user requests "all" items or when the user does not specify the number of query results, MUST show the total number of results from the query.
       In this case, total number of results is {size}.
 2. Display Format:
-   - When number of results ({size}) is more than 10, show all content using <table class="dark-table"> tag.
-   - Table style should be smart, modern, animation, and responsive.
+   - When number of results ({size}) is more than 10, show all of result context using <table> with smart, modern, responsive style.
+   - When you can't show all of result context, show some of results at least 10.
 3. Recommendation:
    - You can recommend next question user can ask like this:
    Questions you can recommend to user may be like this:
