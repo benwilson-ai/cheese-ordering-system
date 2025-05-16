@@ -1,4 +1,6 @@
-from typing import List, Dict, Optional
+import operator
+from typing import List, Dict   
+from typing_extensions import TypedDict, Annotated
 from enum import Enum
 from pydantic import BaseModel
 
@@ -8,11 +10,13 @@ class Message(BaseModel):
     role: str
     content: str
 
-class GraphState(BaseModel):
-    selected: Optional[str] = None
+class GraphState(TypedDict):
+    selected: str
     messages: List[Dict[str, str]]
-    query: Optional[str] = None
-    input_query: Optional[str] = None
-    output_query: Optional[str] = None
-    raw_data: Optional[List[Dict]] = None
+    query: str
+    input_query: str
+    output_query: str
+    raw_data: Annotated[List[Dict], operator.add]
     history: List[Dict[str, str]] = []
+    txt2mongo_result: str
+    txt2pinecone_result: str

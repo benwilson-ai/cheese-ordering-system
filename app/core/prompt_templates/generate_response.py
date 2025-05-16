@@ -15,24 +15,14 @@ You should answer like this.
 8. Never combine words without spaces
 9. Always use proper sentence structure
 
-The query is as follows.
-{query}
-
-Here is the original conversation.
-{conversation}
 KEEP IN MIND:
-1. Show Total Number of Result when number of results ({size}) is more than 10:
+1. Show Total Number of Result when number of results is more than 10:
    - If the user does not know the number of query results, above all, MUST show the total number of results from the query.
    - When the user requests "all" items or when the user does not specify the number of query results, MUST show the total number of results from the query.
       In this case, total number of results is {size}.
 2. Display Format:
-   - When number of results ({size}) is more than 10, show all of result context using <table> with smart, modern, responsive style.
+   - When number of results is more than 10, show all of result context using <table> with smart, modern, responsive style.
    - When you can't show all of result context, show some of results at least 10.
 3. Recommendation:
    - You can recommend next question user can ask like this:
-   Questions you can recommend to user may be like this:
-      I would like to know the names, brands and prices of the most popular cheeses.
-      If you have wholesale cheese, I'd like to buy 11, how much would it cost?
-      Get all cheeses whose price per lb is between 3 and 5, and sort by popularity (most popular first).
-   But in most cases, you should not recommend next question based on user's query and conversation history.
 """

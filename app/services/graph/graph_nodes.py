@@ -42,62 +42,67 @@ def format_conversation_history(messages: List[Dict[str, str]]) -> str:
 #         conversation=format_conversation_history(state.messages)
 #     ), function=determine_selected)
 #     return selected
+def compare_action_node(state: GraphState):
+    return {}
 @traceable
-def reasoner_node(state: GraphState) -> GraphState:
+def reasoner_node(state: GraphState):
+    history = state["history"]
+
+    if(state["selected"]=="compare_action"):
+        history[-1]["observation"]=state["txt2mongo_result"]+state["txt2pinecone_result"]
+        history[-1]["observation"]+="\nFirst, You must compare the result from mongoDB query and vectorDB query. Second, You must select the best result from the two results."
+    elif(state["selected"]=="txt2mongo"):
+        history[-1]["observation"]=state["txt2mongo_result"]
+    elif(state["selected"]=="txt2pinecone"):
+        history[-1]["observation"]=state["txt2pinecone_result"]
     
-    if(len(state.history)==0):
+    if(len(history)==0):
         previous_action="previous action"
         observation="This is first step"
     else:
-        if(state.history[-1]["observation"]):
-            observation=state.history[-1]["observation"]
+        if(history[-1]["observation"]):
+            observation=history[-1]["observation"]
         else:
             observation=""
-        previous_action=state.history[-1]["action"]
+        previous_action=history[-1]["action"]
     
-    print("Reasoning Step"+str(len(state.history)+1))
-    result = model.invoke(state.messages + [SystemMessage(reasoning.format(
-        query=state.query,
-        conversation=format_conversation_history(state.messages),
-        history=json.dumps(state.history), 
+    result = model.invoke(state["messages"] + [SystemMessage(reasoning.format(
+        query=state["query"],
+        conversation=format_conversation_history(state["messages"]),
+        history=json.dumps(state["history"]), 
         previous_action=previous_action,
         observation=observation
     ))])
     json_result = json.loads(result.content.strip())
-    state.selected = json_result["action"]
-    print("Selected "+state.selected)
-    print(json_result["thought"])
-    state.history.append(json_result)
-    state.input_query = json_result["plan"]
-    return state
+    selected = json_result["action"]
+    history.append(json_result)
+    input_query = json_result["plan"]
+    return {"history": history, "selected": selected, "input_query": input_query}
+
 @traceable
-def ambiguit_resolver_node(state: GraphState) -> GraphState:
-    print("----------------------------------------------------")
-    print("Ambiguit Resolver Plan: "+state.history[-1]["plan"])
-    response = model.invoke(state.history[-1]["plan"])
-    print("So I say like that: "+response.content)
-    state.history[-1]["observation"] = "This question is not clear."
-    print("----------------------------------------------------")
+def ambiguit_resolver_node(state: GraphState):
+    history = state["history"]
+    response = model.invoke(history[-1]["plan"])
+    history[-1]["observation"] = "This question is not clear."
     result = interrupt({
         "question": response.content
     })
-    state.query = result["edited_query"]
-    return state
+    query = result["edited_query"]
+    return {"query": query, "history": history}
 @traceable
-def txt2mongo_node(state: GraphState) -> GraphState:
-    response = model.invoke(state.messages + [SystemMessage(generate_mongodb_query.format(
-        query=state.input_query,
-        conversation=format_conversation_history(state.messages)
+def txt2mongo_node(state: GraphState):
+    response = model.invoke(state["messages"] + [SystemMessage(generate_mongodb_query.format(
+        query=state["input_query"],
+        conversation=format_conversation_history(state["messages"])
     ))])
-    state.output_query = response.content.strip().replace('``mongo', '').replace('`', '')
-    print(state.output_query)
-    state.history[-1]["observation"] = "\nThis is result query: "+state.output_query
+    output_query = response.content.strip().replace('``mongo', '').replace('`', '')
+    txt2mongo_result = "\nThis is generated MongoDB aggregation query: "+output_query
     results = []
     try:
-        results = mongodb.query(state.output_query)
+        results = mongodb.query(output_query)
         # Remove _id field from results
         results = [{k: v for k, v in cheese.items() if k != '_id'} for cheese in results]
-        state.raw_data = results
+        raw_data = results
         context = "\n\n".join(
         "\n".join([
             f"{key.replace('_', ' ').title()}: {value}"
@@ -105,28 +110,27 @@ def txt2mongo_node(state: GraphState) -> GraphState:
             if value is not None
             ]) for cheese in results[0:min(3, len(results))]
         )
-        state.history[-1]["observation"]+="\nFound "+str(len(results))+" results.\n This is result context: "+context
+        txt2mongo_result+="\nUsing this MongoDB query, Found "+str(len(results))+" results.\n This is result context from MongoDB: "+context
     except Exception as e:
-        state.history[-1]["observation"]+="\nThis is error: "+str(e)
-        state.raw_data = []
+        txt2mongo_result+="\nThis is error from MongoDB: "+str(e)
+        raw_data = []
     
-    return state
+    return {"txt2mongo_result": txt2mongo_result, "raw_data": raw_data}
 @traceable
-def txt2pinecone_node(state: GraphState) -> GraphState:
-    response = model.invoke(state.messages + [SystemMessage(generate_pinecone_query.format(
-        query=state.input_query,
-        conversation=format_conversation_history(state.messages)
+def txt2pinecone_node(state: GraphState):
+    response = model.invoke(state["messages"] + [SystemMessage(generate_pinecone_query.format(
+        query=state["input_query"],
+        conversation=format_conversation_history(state["messages"])
     ))])
-    state.output_query = response.content.strip().replace('``pinecone', '').replace('`', '')
-    print(state.output_query)
-    state.history[-1]["observation"] = "\nThis is result query: "+state.output_query
+    output_query = response.content.strip().replace('``pinecone', '').replace('`', '')
+    txt2pinecone_result= "\nThis is generated Pinecone VectorDB metadata filter query: "+output_query
     results = []
     try:
-        results = vector_db.query(state.query, top_k=3, filter=state.output_query)
+        results = vector_db.query(state["query"], top_k=3, filter=output_query)
         results = [result.model_dump() for result in results]
         # Remove _id field from results
         results = [{k: v for k, v in cheese.items() if k != '_id'} for cheese in results]
-        state.raw_data = results
+        raw_data = results
         context = "\n\n".join(
         "\n".join([
             f"{key.replace('_', ' ').title()}: {value}"
@@ -134,16 +138,19 @@ def txt2pinecone_node(state: GraphState) -> GraphState:
             if value is not None
             ]) for cheese in results[0:min(3, len(results))]
         )
-        state.history[-1]["observation"]+="\nFound "+str(len(results))+" results.\n This is result context: "+context
+        txt2pinecone_result+="\nUsing this Pinecone VectorDB semantic search query, Found "+str(len(results))+" results.\n This is result context from Pinecone VectorDB: "+context
     except Exception as e:
-        state.history[-1]["observation"]+="\nThis is error: "+str(e)
-        state.raw_data = []
+        txt2pinecone_result+="\nThis is error from Pinecone VectorDB: "+str(e)
+        raw_data = []
     
-    return state
+    return {"txt2pinecone_result": txt2pinecone_result, "raw_data": raw_data}
 @traceable
-def data_retrieval_node(state: GraphState) -> GraphState:
+def data_retrieval_node(state: GraphState):
     try:
-        results = state.raw_data
+        history = state["history"]
+        results = state["raw_data"]
+        
+        messages = state["messages"]
         # Convert ObjectId to string and handle other non-serializable types
         def convert_value(value):
             if hasattr(value, 'to_dict'):  # Handle ObjectId
@@ -165,21 +172,21 @@ def data_retrieval_node(state: GraphState) -> GraphState:
                 if value is not None and key != '_id'
             ]) for cheese in results
         )
+        print(context)
         prompt = generate_response.format(
             context=context,
             size=str(len(results)), 
-            query=state.query,
-            conversation=format_conversation_history(state.messages)
         )
-        state.history[-1]["observation"]="I think I have found the information you need. This is done."
-        response = model.invoke(state.messages + [HumanMessage(prompt)])
-        state.messages.append({"role": "assistant", "content": response.content})
+        history[-1]["observation"]="I think I have found the information you need. This is done."
+        response = model.invoke(state["messages"] + [HumanMessage(prompt)])
+
+        messages.append({"role": "assistant", "content": response.content})
 
     except Exception as e:
         print(f"Error in data retrieval: {str(e)}")
-        state.messages.append({
+        messages.append({
             "role": "assistant",
             "content": "I apologize, but I encountered an error while retrieving the information. Could you please rephrase your question?"
         })
 
-    return state
+    return {"messages": messages, "history": history}

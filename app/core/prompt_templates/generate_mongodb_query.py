@@ -162,7 +162,7 @@ User Question: What is the cheapest cheese?
 
 [
   {{
-    "$match": {{
+    "$sort": {{
       "priceOrder": -1
     }}
   }},

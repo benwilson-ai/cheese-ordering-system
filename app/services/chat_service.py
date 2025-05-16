@@ -7,11 +7,12 @@ import uuid
 from app.core.config import settings, ModelType
 from app.services.graph.graph_state import GraphState
 from app.services.graph.graph_nodes import (
-    txt2mongo_node,
-    data_retrieval_node,
     reasoner_node,
     ambiguit_resolver_node,
+    compare_action_node,
     txt2pinecone_node,
+    txt2mongo_node,
+    data_retrieval_node,
 )
 
 class ChatService:
@@ -28,6 +29,7 @@ class ChatService:
         # Add nodes
         workflow.add_node("reasoner", reasoner_node)
         workflow.add_node("ambiguit_resolver", ambiguit_resolver_node)
+        workflow.add_node("compare_action", compare_action_node)
         workflow.add_node("txt2mongo", txt2mongo_node)
         workflow.add_node("txt2pinecone", txt2pinecone_node)
         workflow.add_node("data_retrieval", data_retrieval_node)
@@ -39,15 +41,17 @@ class ChatService:
         workflow.add_edge("data_retrieval", END)
         workflow.add_conditional_edges(
             "reasoner",
-            lambda state: state.selected,
+            lambda state: state["selected"],
             {
+                "ambiguit_resolver": "ambiguit_resolver",
+                "compare_action": "compare_action",
                 "txt2mongo": "txt2mongo",
                 "txt2pinecone": "txt2pinecone",
-                "data_retrieval": "data_retrieval",
-                "ambiguit_resolver": "ambiguit_resolver",
+                "data_retrieval": "data_retrieval",                
             }
         )
-        
+        workflow.add_edge("compare_action", "txt2mongo")
+        workflow.add_edge("compare_action", "txt2pinecone")
         checkpointer = MemorySaver()
 
         app = workflow.compile(checkpointer=checkpointer)
@@ -59,7 +63,7 @@ class ChatService:
     def process_message(self, query: str, conversation_history: List[Dict[str, str]]) -> str:
         
         messages = conversation_history + [{"role": "user", "content": query}]
-        initial_state = GraphState(messages=messages, query=query)
+        initial_state = GraphState(messages=messages, query=query, history=[], selected="", raw_data=[])
         
         flag= ""
 
