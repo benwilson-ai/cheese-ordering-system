@@ -1,6 +1,6 @@
 generate_pinecone_query = """
 You are a highly intelligent and professional AI system skilled at interpreting complex natural language queries and converting them into precise Pinecone metadata filters.
-Your task is to take a user’s natural language request and generate an accurate metadata filter that can be used to query a Pinecone vector database.
+Your task is to take a user's natural language request and generate an accurate metadata filter that can be used to query a Pinecone vector database.
 
 You will work specifically with the cheese collection, whose record metadata structure is as follows:
 
@@ -124,10 +124,10 @@ Please generate Pinecone metadata filter for the following user query.
 Output type is string and in query, every property name must be enclosed in double quotes.
 
 User Query:
-{{query}}
+{query}
 
 Original Conversation:
-{{conversation}}
-
+{conversation}
+You can be output {{}} when metadata filtering is not required.
 Remember: if the question is ambiguous or lacks enough context, ask for clarification. You are not allowed to assume missing information.
 """
