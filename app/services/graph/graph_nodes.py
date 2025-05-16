@@ -11,6 +11,7 @@ from app.core.prompt_templates.generate_mongodb_query import generate_mongodb_qu
 from app.core.prompt_templates.generate_response import generate_response
 from app.core.function_templates.determine_selected import determine_selected
 from .graph_state import GraphState
+from langsmith.wrappers import wrap_openai
 from langsmith import traceable
 import json
 
@@ -41,7 +42,7 @@ def format_conversation_history(messages: List[Dict[str, str]]) -> str:
 #         conversation=format_conversation_history(state.messages)
 #     ), function=determine_selected)
 #     return selected
-@traceable(config={'extra': 'forbid'})
+@traceable
 def reasoner_node(state: GraphState) -> GraphState:
     
     if(len(state.history)==0):
@@ -69,7 +70,7 @@ def reasoner_node(state: GraphState) -> GraphState:
     state.history.append(json_result)
     state.input_query = json_result["plan"]
     return state
-@traceable(config={'extra': 'forbid'})
+@traceable
 def ambiguit_resolver_node(state: GraphState) -> GraphState:
     print("----------------------------------------------------")
     print("Ambiguit Resolver Plan: "+state.history[-1]["plan"])
@@ -82,7 +83,7 @@ def ambiguit_resolver_node(state: GraphState) -> GraphState:
     })
     state.query = result["edited_query"]
     return state
-@traceable(config={'extra': 'forbid'})
+@traceable
 def txt2mongo_node(state: GraphState) -> GraphState:
     response = model.invoke(state.messages + [SystemMessage(generate_mongodb_query.format(
         query=state.input_query,
@@ -110,7 +111,7 @@ def txt2mongo_node(state: GraphState) -> GraphState:
         state.raw_data = []
     
     return state
-@traceable(config={'extra': 'forbid'})
+@traceable
 def txt2pinecone_node(state: GraphState) -> GraphState:
     response = model.invoke(state.messages + [SystemMessage(generate_pinecone_query.format(
         query=state.input_query,
@@ -139,7 +140,7 @@ def txt2pinecone_node(state: GraphState) -> GraphState:
         state.raw_data = []
     
     return state
-@traceable(config={'extra': 'forbid'})
+@traceable
 def data_retrieval_node(state: GraphState) -> GraphState:
     try:
         results = state.raw_data

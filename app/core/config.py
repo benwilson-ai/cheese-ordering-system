@@ -17,6 +17,11 @@ class Settings(BaseSettings):
     # OpenAI settings
     OPENAI_API_KEY: str
     
+    # LangSmith settings
+    LANGSMITH_ENDPOINT: str = "https://api.smith.langchain.com"
+    LANGSMITH_API_KEY: str
+    LANGSMITH_PROJECT: str
+    LANGSMITH_TRACING: bool = True
     class Config:
         env_file = ".env"
         case_sensitive = True
