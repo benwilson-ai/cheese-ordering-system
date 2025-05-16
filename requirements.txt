@@ -1,6 +1,5 @@
 langchain_core==0.3.60
 langchain_openai==0.3.16
-langchain_pinecone==0.2.6
 langgraph==0.4.3
 pinecone==5.3.1
 pydantic==2.11.4
