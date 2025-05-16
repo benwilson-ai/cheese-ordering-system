@@ -76,7 +76,7 @@ def ambiguit_resolver_node(state: GraphState) -> GraphState:
     print("Ambiguit Resolver Plan: "+state.history[-1]["plan"])
     response = model.invoke(state.history[-1]["plan"])
     print("So I say like that: "+response.content)
-    
+    state.history[-1]["observation"] = "This question is not clear."
     print("----------------------------------------------------")
     result = interrupt({
         "question": response.content
@@ -103,7 +103,7 @@ def txt2mongo_node(state: GraphState) -> GraphState:
             f"{key.replace('_', ' ').title()}: {value}"
             for key, value in cheese.items()
             if value is not None
-            ]) for cheese in results
+            ]) for cheese in results[0:min(3, len(results))]
         )
         state.history[-1]["observation"]+="\nFound "+str(len(results))+" results.\n This is result context: "+context
     except Exception as e:
@@ -132,7 +132,7 @@ def txt2pinecone_node(state: GraphState) -> GraphState:
             f"{key.replace('_', ' ').title()}: {value}"
             for key, value in cheese.items()
             if value is not None
-            ]) for cheese in results
+            ]) for cheese in results[0:min(3, len(results))]
         )
         state.history[-1]["observation"]+="\nFound "+str(len(results))+" results.\n This is result context: "+context
     except Exception as e:

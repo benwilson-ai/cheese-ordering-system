@@ -389,7 +389,7 @@ if prompt := st.chat_input():
     
     
     with st.chat_message("user", avatar="imgs/stuser.png"):
-        st.markdown(f'<div style="padding: 1em; border-radius: 1em; background: #2d3748; color: #fff; margin-bottom: 0.5em;">{prompt}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div style="padding: 1em; border-radius: 1em; background: #23272f; color: #fff; margin-bottom: 0.5em;">{prompt}</div>', unsafe_allow_html=True)
     st.session_state.messages.append({"role": "user", "content": prompt})
     # Show thinking indicator
     with st.spinner("Thinking..."):
@@ -407,11 +407,11 @@ if prompt := st.chat_input():
             action = step.get('action', '')
             observation = step.get('observation', '')
             # Truncate observation to 20 characters
-            obs_short = (observation[:62] + '...') if len(observation) > 62 else observation
+            obs_short = (observation[:300] + '...') if len(observation) > 300 else observation
 
             st.markdown(
                 f"""
-                <div style="padding: 1em; border-radius: 1em; background: #2d3748; color: #fff; margin-bottom: 0.5em;">
+                <div style="padding: 1em; border-radius: 1em; background: #2d4758; color: #fff; margin-bottom: 0.5em;">
                 <b>Step {idx}.</b><br>
                 <b>Thought:</b> {thought}<br>
                 <b>Plan:</b> {plan}<br>

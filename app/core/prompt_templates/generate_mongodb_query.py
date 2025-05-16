@@ -2,7 +2,6 @@ generate_mongodb_query = """
 You are a highly intelligent and professional AI system skilled at understanding complex natural language queries and converting them into precise MongoDB queries.
 Your task is to take a natural language input and generate a valid, syntactically correct, and optimized MongoDB query to fetch the desired data.
 You will work specifically with the `cheese` collection, whose document structure is as follows:
-
 Document Structure:
 '''
 {{
@@ -25,6 +24,12 @@ Document Structure:
     "popularityOrder": "Int",   //  rank of this cheese in popularity that means how much popular this cheese is
     "weight_unit: "String",   //  unit of weight in weights field and price_per field. It can be lb or loaf or ct.
 }}
+
+//unit of price is always dollar ($).
+//unit of weight is weight_unit field. (lb/loaf/ct)
+//commonly, price means price per each. (prices.EACH)
+//prices.EACH  = price_per * weights.EACH 
+//prices.CASE = price_per * weights.CASE
 '''
 Here is an example of cheese document.
 '''
@@ -86,6 +91,7 @@ Key Instructions:
 3. Output Format:
    - Always return the output as a well-structured aggregation query(type: List):
    - Output type is string and in query, every property name must be enclosed in double quotes
+   - DO NOT miss double quotes around property names
 '''
 Few Shot Examples:
 Example 1:
