@@ -15,11 +15,11 @@ from langsmith.wrappers import wrap_openai
 from langsmith import traceable
 import json
 
-model = wrap_openai(ChatOpenAI(
+model = ChatOpenAI(
     model=ModelType.gpt4o,
     openai_api_key=settings.OPENAI_API_KEY, 
     temperature=0.3,
-))
+)
 
 # def extract_function_params(prompt, function):
 #     function_name = function["function"]["name"]
@@ -42,7 +42,7 @@ def format_conversation_history(messages: List[Dict[str, str]]) -> str:
 #         conversation=format_conversation_history(state.messages)
 #     ), function=determine_selected)
 #     return selected
-@traceable(config={'extra': 'forbid'})
+@traceable
 def reasoner_node(state: GraphState) -> GraphState:
     
     if(len(state.history)==0):
@@ -70,20 +70,20 @@ def reasoner_node(state: GraphState) -> GraphState:
     state.history.append(json_result)
     state.input_query = json_result["plan"]
     return state
-@traceable(config={'extra': 'forbid'})
+@traceable
 def ambiguit_resolver_node(state: GraphState) -> GraphState:
     print("----------------------------------------------------")
     print("Ambiguit Resolver Plan: "+state.history[-1]["plan"])
     response = model.invoke(state.history[-1]["plan"])
     print("So I say like that: "+response.content)
-    
+    state.history[-1]["observation"] = "This question is not clear."
     print("----------------------------------------------------")
     result = interrupt({
         "question": response.content
     })
     state.query = result["edited_query"]
     return state
-@traceable(config={'extra': 'forbid'})
+@traceable
 def txt2mongo_node(state: GraphState) -> GraphState:
     response = model.invoke(state.messages + [SystemMessage(generate_mongodb_query.format(
         query=state.input_query,
@@ -103,7 +103,7 @@ def txt2mongo_node(state: GraphState) -> GraphState:
             f"{key.replace('_', ' ').title()}: {value}"
             for key, value in cheese.items()
             if value is not None
-            ]) for cheese in results
+            ]) for cheese in results[0:min(3, len(results))]
         )
         state.history[-1]["observation"]+="\nFound "+str(len(results))+" results.\n This is result context: "+context
     except Exception as e:
@@ -111,7 +111,7 @@ def txt2mongo_node(state: GraphState) -> GraphState:
         state.raw_data = []
     
     return state
-@traceable(config={'extra': 'forbid'})
+@traceable
 def txt2pinecone_node(state: GraphState) -> GraphState:
     response = model.invoke(state.messages + [SystemMessage(generate_pinecone_query.format(
         query=state.input_query,
@@ -132,7 +132,7 @@ def txt2pinecone_node(state: GraphState) -> GraphState:
             f"{key.replace('_', ' ').title()}: {value}"
             for key, value in cheese.items()
             if value is not None
-            ]) for cheese in results
+            ]) for cheese in results[0:min(3, len(results))]
         )
         state.history[-1]["observation"]+="\nFound "+str(len(results))+" results.\n This is result context: "+context
     except Exception as e:
@@ -140,7 +140,7 @@ def txt2pinecone_node(state: GraphState) -> GraphState:
         state.raw_data = []
     
     return state
-@traceable(config={'extra': 'forbid'})
+@traceable
 def data_retrieval_node(state: GraphState) -> GraphState:
     try:
         results = state.raw_data

@@ -7,7 +7,6 @@ import uuid
 from app.core.config import settings, ModelType
 from app.services.graph.graph_state import GraphState
 from app.services.graph.graph_nodes import (
-    # decide_selected,
     txt2mongo_node,
     data_retrieval_node,
     reasoner_node,
@@ -18,7 +17,7 @@ from app.services.graph.graph_nodes import (
 class ChatService:
     def __init__(self):
         self.data_retrieval_graph = self._build_data_retrieval_graph()
-        self.model = ChatOpenAI(
+        self.model = ChatOpenAI(                                                                                                        
             model=ModelType.gpt4o,
             openai_api_key=settings.OPENAI_API_KEY
         )
